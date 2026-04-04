@@ -28,6 +28,7 @@ import { generateImage, streamText } from '@/packages/model-calls'
 import { getModelDisplayName } from '@/packages/model-setting-utils'
 import { estimateTokensFromMessages } from '@/packages/token'
 import platform from '@/platform'
+import { getPluginContextSummary } from '@/plugins/toolset'
 import storage from '@/storage'
 import { StorageKeyGenerator } from '@/storage/StoreStorage'
 import { trackEvent } from '@/utils/track'
@@ -187,6 +188,10 @@ export async function generate(
           model.isSupportToolUse('read-file'),
           { compactionPoints: session.compactionPoints }
         )
+        const pluginContext = getPluginContextSummary(session.activePlugins ?? [])
+        const promptMessagesWithPluginContext = pluginContext
+          ? [createMessage('system', pluginContext), ...promptMsgs]
+          : promptMsgs
         const modifyMessageCache: OnResultChangeWithCancel = async (updated) => {
           const textLength = getMessageText(targetMsg, true, true).length
           if (!firstTokenLatency && textLength > 0) {
@@ -208,7 +213,7 @@ export async function generate(
 
         const { result } = await streamText(model, {
           sessionId: session.id,
-          messages: promptMsgs,
+          messages: promptMessagesWithPluginContext,
           onResultChangeWithCancel: modifyMessageCache,
           onStatusChange: (status) => {
             targetMsg = {
@@ -225,7 +230,7 @@ export async function generate(
           ...targetMsg,
           generating: false,
           cancel: undefined,
-          tokensUsed: targetMsg.tokensUsed ?? estimateTokensFromMessages([...promptMsgs, targetMsg]),
+          tokensUsed: targetMsg.tokensUsed ?? estimateTokensFromMessages([...promptMessagesWithPluginContext, targetMsg]),
           status: [],
           finishReason: result.finishReason,
           usage: result.usage,
@@ -435,7 +440,7 @@ export async function genMessageContext(
     const keys = Array.from(allStorageKeys)
     const contents = await Promise.all(keys.map((key) => storageGetBlob(key)))
     keys.forEach((key, index) => {
-      blobContents.set(key, contents[index])
+      blobContents.set(key, contents[index] ?? '')
     })
   }
 

@@ -503,7 +503,7 @@ const _Message: FC<Props> = (props) => {
                     </div>
                   )
                 ) : item.type === 'tool-call' ? (
-                  <ToolCallPartUI key={item.toolCallId} part={item as MessageToolCallPart} />
+                  <ToolCallPartUI key={item.toolCallId} part={item as MessageToolCallPart} sessionId={sessionId} />
                 ) : null
               )}
             </div>

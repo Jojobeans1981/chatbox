@@ -132,6 +132,7 @@ function BackgroundImageOverlay() {
 function Root() {
   const { isExceeded, versionLoaded } = useVersion()
   const location = useLocation()
+  const isPluginRoute = location.pathname.startsWith('/plugins/')
   const spellCheck = useSettingsStore((state) => state.spellCheck)
   const language = useLanguage()
   const initialized = useRef(false)
@@ -156,7 +157,7 @@ function Root() {
       setRemoteConfig(async (prev) => ({ ...(await prev), ...remoteConfig }))
 
       // Skip guide-related checks if already on guide or settings/mcp page
-      if (location.pathname === '/guide' || location.pathname === '/settings/mcp') {
+      if (location.pathname === '/guide' || location.pathname === '/settings/mcp' || isPluginRoute) {
         initialized.current = true
         return
       }
@@ -192,7 +193,7 @@ function Root() {
         return
       }
     })()
-  }, [setOpenAboutDialog, setRemoteConfig, location.pathname, isExceeded, versionLoaded])
+  }, [setOpenAboutDialog, setRemoteConfig, location.pathname, isExceeded, versionLoaded, isPluginRoute])
 
   const showSidebar = useUIStore((s) => s.showSidebar)
   const sidebarWidth = useSidebarWidth()
@@ -211,6 +212,9 @@ function Root() {
   }, [_theme])
 
   useEffect(() => {
+    if (isPluginRoute) {
+      return
+    }
     ;(() => {
       const { startupPage } = settingsStore.getState()
       const sid = JSON.parse(localStorage.getItem('_currentSessionIdCachedAtom') || '""') as string
@@ -221,7 +225,7 @@ function Root() {
         })
       }
     })()
-  }, [])
+  }, [isPluginRoute])
 
   useEffect(() => {
     if (platform.onNavigate) {
@@ -250,6 +254,16 @@ function Root() {
       document.documentElement.removeAttribute('data-need-room-for-mac-controls')
     }
   }, [needRoomForMacWindowControls])
+
+  if (isPluginRoute) {
+    return (
+      <Box className="box-border App relative" spellCheck={spellCheck} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <ErrorBoundary name="plugin-route">
+          <Outlet />
+        </ErrorBoundary>
+      </Box>
+    )
+  }
 
   return (
     <Box className="box-border App relative" spellCheck={spellCheck} dir={language === 'ar' ? 'rtl' : 'ltr'}>

@@ -26,6 +26,7 @@ import { formatElapsedTime, useThinkingTimer } from '@/hooks/useThinkingTimer'
 import { getToolName } from '@/packages/tools'
 import type { SearchResultItem } from '@/packages/web-search'
 import { ScalableIcon } from '../common/ScalableIcon'
+import PluginFrame from '../plugins/PluginFrame'
 
 // ─── Tool Icon Mapping ──────────────────────────────────────────────
 
@@ -36,6 +37,9 @@ const toolIconMap: Record<string, React.ElementType> = {
   file_search: IconFileSearch,
   query_knowledge_base: IconDatabase,
   parse_link: IconExternalLink,
+  quiz__open_quiz: IconBulb,
+  quiz__submit_answer: IconCheck,
+  quiz__update_quiz_title: IconEdit,
   create_file: IconFile,
   edit_file: IconEdit,
   delete_file: IconFileMinus,
@@ -43,6 +47,9 @@ const toolIconMap: Record<string, React.ElementType> = {
   get_files_meta: IconFileSearch,
   read_file_chunks: IconFile,
   read_file: IconFile,
+  flashcards__open_deck: IconBulb,
+  flashcards__flip_card: IconCopy,
+  flashcards__next_card: IconChevronDown,
 }
 
 const getToolIcon = (toolName: string) => toolIconMap[toolName] || IconCode
@@ -372,11 +379,53 @@ const ParseLinkUI: FC<{ part: MessageToolCallPart }> = ({ part }) => {
   )
 }
 
+function getPluginRenderPayload(part: MessageToolCallPart) {
+  const result = part.result as
+    | {
+        plugin?: {
+          pluginId?: string
+          sessionId?: string
+          capabilityToken?: string
+          allowedTools?: string[]
+          pendingInvocation?: {
+            toolName?: string
+            params?: Record<string, unknown>
+          }
+        }
+      }
+    | undefined
+
+  const plugin = result?.plugin
+  if (
+    !plugin ||
+    typeof plugin.pluginId !== 'string' ||
+    typeof plugin.sessionId !== 'string' ||
+    typeof plugin.capabilityToken !== 'string' ||
+    !Array.isArray(plugin.allowedTools)
+  ) {
+    return null
+  }
+
+  return {
+    pluginId: plugin.pluginId,
+    pluginSessionId: plugin.sessionId,
+    capabilityToken: plugin.capabilityToken,
+    allowedTools: plugin.allowedTools.filter((toolName): toolName is string => typeof toolName === 'string'),
+    pendingToolName:
+      typeof plugin.pendingInvocation?.toolName === 'string' ? plugin.pendingInvocation.toolName : undefined,
+    pendingToolParams:
+      plugin.pendingInvocation?.params && typeof plugin.pendingInvocation.params === 'object'
+        ? plugin.pendingInvocation.params
+        : undefined,
+  }
+}
+
 // ─── General Tool Call ──────────────────────────────────────────────
 
-const GeneralToolCallUI: FC<{ part: MessageToolCallPart }> = ({ part }) => {
+const GeneralToolCallUI: FC<{ part: MessageToolCallPart; sessionId: string }> = ({ part, sessionId }) => {
   const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
+  const pluginPayload = getPluginRenderPayload(part)
 
   return (
     <Stack gap={6} mb="xs">
@@ -407,20 +456,32 @@ const GeneralToolCallUI: FC<{ part: MessageToolCallPart }> = ({ part }) => {
           </Stack>
         </Box>
       </Collapse>
+      {pluginPayload && (
+        <PluginFrame
+          chatSessionId={sessionId}
+          pluginId={pluginPayload.pluginId}
+          pluginSessionId={pluginPayload.pluginSessionId}
+          capabilityToken={pluginPayload.capabilityToken}
+          allowedTools={pluginPayload.allowedTools}
+          pendingInvocationId={part.toolCallId}
+          pendingToolName={pluginPayload.pendingToolName}
+          pendingToolParams={pluginPayload.pendingToolParams}
+        />
+      )}
     </Stack>
   )
 }
 
 // ─── Entry Point ────────────────────────────────────────────────────
 
-export const ToolCallPartUI: FC<{ part: MessageToolCallPart }> = ({ part }) => {
+export const ToolCallPartUI: FC<{ part: MessageToolCallPart; sessionId: string }> = ({ part, sessionId }) => {
   if (part.toolName === 'web_search') {
     return <WebSearchGroupUI parts={[part]} />
   }
   if (part.toolName === 'parse_link') {
     return <ParseLinkUI part={part} />
   }
-  return <GeneralToolCallUI part={part} />
+  return <GeneralToolCallUI part={part} sessionId={sessionId} />
 }
 
 // ─── Reasoning / Thinking (Minimal Inline) ──────────────────────────

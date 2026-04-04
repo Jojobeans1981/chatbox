@@ -246,6 +246,18 @@ export const SessionThreadSchema = z.object({
   compactionPoints: z.array(CompactionPointSchema).optional(),
 })
 
+export const PluginSessionSchema = z.object({
+  id: z.string(),
+  pluginId: z.string(),
+  capabilityToken: z.string(),
+  allowedTools: z.array(z.string()),
+  stateSummary: z.string(),
+  stateSnapshot: z.record(z.string(), z.unknown()).optional(),
+  status: z.enum(['active', 'completed', 'error']),
+  createdAt: z.number(),
+  completedAt: z.number().optional(),
+})
+
 // Image source schema
 export const ImageSourceSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('url'), url: z.string() }),
@@ -258,6 +270,7 @@ export const SessionSchema = z.object({
   name: z.string(),
   picUrl: z.string().optional(),
   messages: z.array(MessageSchema),
+  activePlugins: z.array(PluginSessionSchema).optional(),
   starred: z.boolean().optional(),
   hidden: z.boolean().optional(), // Hidden from session list (e.g., migrated picture sessions)
   copilotId: z.string().optional(),
@@ -315,4 +328,5 @@ export type CompactionPoint = z.infer<typeof CompactionPointSchema>
 export type Session = z.infer<typeof SessionSchema>
 export type SessionMeta = z.infer<typeof SessionMetaSchema>
 export type SessionThread = z.infer<typeof SessionThreadSchema>
+export type PluginSession = z.infer<typeof PluginSessionSchema>
 export type SessionThreadBrief = z.infer<typeof SessionThreadBriefSchema>

@@ -33,6 +33,7 @@ import {
   knowledgeBaseSearchByPromptEngineering,
   searchByPromptEngineering,
 } from './tools'
+import { buildPluginToolSet, getPluginToolInstructions } from '@/plugins/toolset'
 import fileToolSet from './toolsets/file'
 import { getToolSet } from './toolsets/knowledge-base'
 import websearchToolSet, { parseLinkTool, webSearchTool } from './toolsets/web-search'
@@ -174,6 +175,9 @@ export async function streamText(
   if (webBrowsing && !webNotSupported) {
     toolSetInstructions += websearchToolSet.description
   }
+  if (sessionId) {
+    toolSetInstructions += getPluginToolInstructions()
+  }
 
   params.messages = injectModelSystemPrompt(
     model.modelId,
@@ -313,6 +317,13 @@ export async function streamText(
       tools = {
         ...tools,
         ...fileToolSet.tools,
+      }
+    }
+    if (sessionId) {
+      const pluginToolSet = buildPluginToolSet(sessionId)
+      tools = {
+        ...tools,
+        ...pluginToolSet.tools,
       }
     }
 
