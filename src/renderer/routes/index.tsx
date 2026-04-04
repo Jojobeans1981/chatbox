@@ -1,7 +1,16 @@
 import NiceModal from '@ebay/nice-modal-react'
-import { ActionIcon, Avatar, Box, Button, Divider, Flex, Paper, ScrollArea, Space, Stack, Text } from '@mantine/core'
+import { ActionIcon, Avatar, Badge, Box, Button, Divider, Flex, Paper, ScrollArea, Space, Stack, Text } from '@mantine/core'
 import type { CopilotDetail, ImageSource, Session } from '@shared/types'
-import { IconChevronLeft, IconChevronRight, IconMessageCircle2Filled, IconX } from '@tabler/icons-react'
+import {
+  IconCards,
+  IconChevronLeft,
+  IconChevronRight,
+  IconDeviceGamepad2,
+  IconMessageCircle2Filled,
+  IconSchool,
+  IconShieldLock,
+  IconX,
+} from '@tabler/icons-react'
 import { createFileRoute, useRouterState } from '@tanstack/react-router'
 import { zodValidator } from '@tanstack/zod-adapter'
 import clsx from 'clsx'
@@ -30,6 +39,7 @@ import { submitNewUserMessage, switchCurrentSession } from '@/stores/sessionActi
 import { initEmptyChatSession } from '@/stores/sessionHelpers'
 import { useLanguage, useSettingsStore } from '@/stores/settingsStore'
 import { useUIStore } from '@/stores/uiStore'
+import { CHATBOX_BUILD_PLATFORM } from '@/variables'
 import { getHomeWelcomeCardMode } from '@/utils/homeWelcomeCard'
 
 export const Route = createFileRoute('/')({
@@ -71,6 +81,7 @@ function Index() {
     () => getHomeWelcomeCardMode({ providerCount: providers.length, isLoggedIn, hasLicense }),
     [providers.length, isLoggedIn, hasLicense]
   )
+  const showDemoLanding = CHATBOX_BUILD_PLATFORM === 'web' && providers.length === 0 && !isLoggedIn && !hasLicense
 
   const selectedModel = useMemo(() => {
     if (session.settings?.provider && session.settings?.modelId) {
@@ -226,10 +237,140 @@ function Index() {
     return true
   }, [session])
 
+  const demoApps = useMemo(
+    () => [
+      {
+        id: 'chess',
+        name: 'Chess',
+        description: 'Play a full game in-chat, ask for a hint mid-match, and keep the board state in context.',
+        badge: 'Required app',
+        icon: IconDeviceGamepad2,
+      },
+      {
+        id: 'quiz',
+        name: 'Quiz Studio',
+        description: 'Students answer questions in chat while teachers can unlock editing with a protected passcode.',
+        badge: 'Authenticated',
+        icon: IconShieldLock,
+      },
+      {
+        id: 'flashcards',
+        name: 'Flashcards',
+        description: 'Review cards, flip for answers, and move through a study deck without leaving the conversation.',
+        badge: 'Study tool',
+        icon: IconCards,
+      },
+    ],
+    []
+  )
+
   return (
     <Page title="">
       <div className="p-0 flex flex-col h-full">
-        {messageLayout || welcomeCardMode !== 'none' ? (
+        {showDemoLanding ? (
+          <Stack align="center" justify="center" gap="lg" flex={1} p="md">
+            <Stack gap="xs" align="center" maw={720}>
+              <Badge variant="light" radius="xl" size="lg">
+                TutorMeAI Demo
+              </Badge>
+              <Text fw={700} size={isSmallScreen ? 'xl' : '32px'} ta="center">
+                Launch the embedded learning apps directly
+              </Text>
+              <Text c="chatbox-secondary" ta="center" maw={620}>
+                This public build opens in demo mode so reviewers can try the K-12 app experiences without configuring
+                an AI provider first.
+              </Text>
+            </Stack>
+
+            <Flex
+              gap="md"
+              wrap="wrap"
+              justify="center"
+              className={widthFull ? 'w-full' : 'w-full max-w-5xl mx-auto'}
+            >
+              {demoApps.map((app) => {
+                const Icon = app.icon
+                return (
+                  <Paper
+                    key={app.id}
+                    radius="xl"
+                    withBorder
+                    p="lg"
+                    shadow="none"
+                    style={{ width: isSmallScreen ? '100%' : 320 }}
+                  >
+                    <Stack gap="md" h="100%" justify="space-between">
+                      <Stack gap="sm">
+                        <Flex justify="space-between" align="center" gap="sm">
+                          <Flex align="center" gap="sm">
+                            <Box
+                              style={{
+                                width: 44,
+                                height: 44,
+                                borderRadius: 14,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background:
+                                  'linear-gradient(135deg, var(--chatbox-background-brand-secondary), rgba(99, 102, 241, 0.14))',
+                              }}
+                            >
+                              <Icon size={22} color="var(--chatbox-tint-brand)" />
+                            </Box>
+                            <Stack gap={2}>
+                              <Text fw={700}>{app.name}</Text>
+                              <Badge variant="dot" color="chatbox-brand" w="fit-content">
+                                {app.badge}
+                              </Badge>
+                            </Stack>
+                          </Flex>
+                        </Flex>
+                        <Text c="chatbox-secondary">{app.description}</Text>
+                      </Stack>
+
+                      <Button
+                        fullWidth
+                        onClick={() =>
+                          router.navigate({
+                            to: '/plugins/$pluginId',
+                            params: { pluginId: app.id },
+                          })
+                        }
+                      >
+                        Open {app.name}
+                      </Button>
+                    </Stack>
+                  </Paper>
+                )
+              })}
+            </Flex>
+
+            <Paper radius="lg" withBorder p="md" className={widthFull ? 'w-full' : 'w-full max-w-3xl mx-auto'}>
+              <Flex align="flex-start" gap="sm">
+                <Box
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--chatbox-background-brand-secondary)',
+                  }}
+                >
+                  <IconSchool size={18} color="var(--chatbox-tint-brand)" />
+                </Box>
+                <Stack gap={4}>
+                  <Text fw={600}>Reviewer notes</Text>
+                  <Text c="chatbox-secondary">
+                    Chess shows complex ongoing state, Quiz Studio demonstrates authenticated teacher controls, and
+                    Flashcards covers a lightweight study workflow inside the same host shell.
+                  </Text>
+                </Stack>
+              </Flex>
+            </Paper>
+          </Stack>
+        ) : messageLayout || welcomeCardMode !== 'none' ? (
           <Stack align="center" justify="center" gap="sm" flex={1}>
             <HomepageIcon className="h-8" />
             <Text fw="600" size={isSmallScreen ? 'sm' : 'md'}>
@@ -288,7 +429,7 @@ function Index() {
           </Stack>
         )}
 
-        {welcomeCardMode !== 'none' && (
+        {!showDemoLanding && welcomeCardMode !== 'none' && (
           <Box px="sm">
             <Paper
               radius="md"
@@ -384,7 +525,8 @@ function Index() {
           </Box>
         )}
 
-        <Stack gap="sm">
+        {!showDemoLanding && (
+          <Stack gap="sm">
           {session.copilotId ? (
             <Box px="md">
               <Stack gap="sm" className={widthFull ? 'w-full' : 'w-full max-w-4xl mx-auto'}>
@@ -432,7 +574,8 @@ function Index() {
             onClickSessionSettings={onClickSessionSettings}
             onSubmit={handleSubmit}
           />
-        </Stack>
+          </Stack>
+        )}
       </div>
     </Page>
   )

@@ -57,6 +57,7 @@ import Sidebar from '@/Sidebar'
 import storage from '@/storage'
 import * as atoms from '@/stores/atoms'
 import { useSession } from '@/stores/chatStore'
+import { useAuthInfoStore } from '@/stores/authInfoStore'
 import { initOnboardingStore, onboardingStore } from '@/stores/onboardingStore'
 import * as premiumActions from '@/stores/premiumActions'
 import * as settingActions from '@/stores/settingActions'
@@ -136,6 +137,17 @@ function Root() {
   const spellCheck = useSettingsStore((state) => state.spellCheck)
   const language = useLanguage()
   const initialized = useRef(false)
+  const hasLicense = useSettingsStore((state) => Boolean(state.licenseKey))
+  const providerSettings = useSettingsStore((state) => state.providers)
+  const isLoggedIn = useAuthInfoStore((state) => Boolean(state.accessToken && state.refreshToken))
+  const hasConfiguredProvider = useMemo(
+    () =>
+      Object.values(providerSettings || {}).some((provider) =>
+        Boolean(provider?.apiKey || provider?.apiHost || provider?.models?.length || provider?.oauth?.accessToken)
+      ),
+    [providerSettings]
+  )
+  const showWebDemoLanding = CHATBOX_BUILD_PLATFORM === 'web' && !hasLicense && !isLoggedIn && !hasConfiguredProvider
 
   const setOpenAboutDialog = useUIStore((s) => s.setOpenAboutDialog)
 
@@ -180,7 +192,7 @@ function Root() {
       const needsSetup = settingActions.needEditSetting()
 
       // Auto-navigate to guide for new users who need setup
-      if (!isExceeded && !onboardingCompleted && needsSetup) {
+      if (!showWebDemoLanding && !isExceeded && !onboardingCompleted && needsSetup) {
         router.navigate({ to: '/guide', replace: true })
         return
       }
@@ -193,7 +205,7 @@ function Root() {
         return
       }
     })()
-  }, [setOpenAboutDialog, setRemoteConfig, location.pathname, isExceeded, versionLoaded, isPluginRoute])
+  }, [setOpenAboutDialog, setRemoteConfig, location.pathname, isExceeded, versionLoaded, isPluginRoute, showWebDemoLanding])
 
   const showSidebar = useUIStore((s) => s.showSidebar)
   const sidebarWidth = useSidebarWidth()
