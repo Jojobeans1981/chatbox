@@ -231,48 +231,60 @@ export function FlashcardsApp() {
       style={{
         minHeight: '100vh',
         padding: '24px',
-        color: '#fff7ed',
-        background: 'linear-gradient(160deg, #7c2d12 0%, #431407 40%, #1c1917 100%)',
-        fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+        color: '#0f172a',
+        background:
+          'radial-gradient(circle at top left, rgba(168, 85, 247, 0.16), transparent 24%), radial-gradient(circle at top right, rgba(244, 114, 182, 0.14), transparent 26%), linear-gradient(180deg, #fdf4ff 0%, #ffffff 42%, #fdf2f8 100%)',
+        fontFamily: '"Trebuchet MS", "Avenir Next", sans-serif',
       }}
     >
       <div style={{ maxWidth: '720px', margin: '0 auto', display: 'grid', gap: '16px' }}>
         <div
           style={{
-            borderRadius: '24px',
+            borderRadius: '30px',
             padding: '24px',
-            background: 'rgba(41, 17, 7, 0.72)',
-            border: '1px solid rgba(251, 191, 36, 0.2)',
-            boxShadow: '0 24px 70px rgba(0, 0, 0, 0.3)',
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            boxShadow: '0 24px 70px rgba(236, 72, 153, 0.16)',
+            color: '#fff',
           }}
         >
           <div style={{ fontSize: '12px', letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.72 }}>
-            Study Deck
+            Memory Boost
           </div>
           <div style={{ fontSize: '32px', fontWeight: 800, marginTop: '8px' }}>{deck.title}</div>
-          <div style={{ fontSize: '15px', marginTop: '10px', color: '#fde68a' }}>{status}</div>
+          <div style={{ fontSize: '15px', marginTop: '10px', color: 'rgba(255,255,255,0.9)' }}>{status}</div>
         </div>
 
         <div
           style={{
-            borderRadius: '24px',
+            borderRadius: '30px',
             padding: '22px',
             minHeight: '260px',
-            background: 'rgba(28, 25, 23, 0.82)',
-            border: '1px solid rgba(251, 191, 36, 0.18)',
+            background: '#ffffff',
+            border: '1px solid rgba(236, 72, 153, 0.12)',
             display: 'grid',
             alignItems: 'center',
             justifyItems: 'center',
             textAlign: 'center',
+            boxShadow: '0 24px 50px rgba(15, 23, 42, 0.06)',
           }}
         >
-          <div style={{ fontSize: '12px', opacity: 0.7 }}>
+          <div style={{ fontSize: '12px', opacity: 0.7, color: '#64748b', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             Card {currentIndex + 1} of {deck.cards.length} | {deck.subject}
           </div>
-          <div style={{ fontSize: '28px', fontWeight: 800, lineHeight: 1.3, maxWidth: '560px' }}>
+          <div style={{ fontSize: '29px', fontWeight: 900, lineHeight: 1.28, maxWidth: '560px', color: '#0f172a' }}>
             {currentCard ? (flipped ? currentCard.back : currentCard.front) : 'No card selected'}
           </div>
-          <div style={{ fontSize: '13px', color: '#fcd34d' }}>
+          <div
+            style={{
+              fontSize: '13px',
+              color: flipped ? '#be185d' : '#7c3aed',
+              fontWeight: 800,
+              padding: '6px 12px',
+              borderRadius: '999px',
+              background: flipped ? 'rgba(244, 114, 182, 0.12)' : 'rgba(168, 85, 247, 0.12)',
+            }}
+          >
             {flipped ? 'Answer side' : 'Question side'}
           </div>
         </div>
@@ -288,12 +300,13 @@ export function FlashcardsApp() {
             onClick={() => openDeck(deck.subject)}
             style={{
               border: 0,
-              borderRadius: '12px',
+              borderRadius: '14px',
               padding: '12px 16px',
-              background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)',
-              color: '#431407',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
+              color: '#fff',
               fontWeight: 800,
               cursor: 'pointer',
+              boxShadow: '0 12px 24px rgba(236, 72, 153, 0.18)',
             }}
           >
             Restart Deck
@@ -301,13 +314,13 @@ export function FlashcardsApp() {
           <button
             onClick={() => flipCard()}
             style={{
-              borderRadius: '12px',
+              borderRadius: '14px',
               padding: '12px 16px',
-              background: 'transparent',
-              color: '#fff7ed',
+              background: '#ffffff',
+              color: '#334155',
               fontWeight: 700,
               cursor: 'pointer',
-              border: '1px solid rgba(251, 191, 36, 0.2)',
+              border: '1px solid rgba(148, 163, 184, 0.18)',
             }}
           >
             Flip Card
@@ -315,13 +328,13 @@ export function FlashcardsApp() {
           <button
             onClick={() => nextCard()}
             style={{
-              borderRadius: '12px',
+              borderRadius: '14px',
               padding: '12px 16px',
-              background: 'transparent',
-              color: '#fff7ed',
+              background: '#ffffff',
+              color: '#334155',
               fontWeight: 700,
               cursor: 'pointer',
-              border: '1px solid rgba(251, 191, 36, 0.2)',
+              border: '1px solid rgba(148, 163, 184, 0.18)',
             }}
           >
             Next Card

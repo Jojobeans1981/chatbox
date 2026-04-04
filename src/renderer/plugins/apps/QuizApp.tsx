@@ -363,35 +363,37 @@ export function QuizApp() {
       style={{
         minHeight: '100vh',
         padding: '24px',
-        color: '#f9fafb',
-        background: 'linear-gradient(160deg, #1d4ed8 0%, #0f172a 45%, #172554 100%)',
-        fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+        color: '#0f172a',
+        background:
+          'radial-gradient(circle at top left, rgba(34, 197, 94, 0.16), transparent 24%), radial-gradient(circle at top right, rgba(56, 189, 248, 0.16), transparent 28%), linear-gradient(180deg, #f0fdf4 0%, #ffffff 44%, #eff6ff 100%)',
+        fontFamily: '"Trebuchet MS", "Avenir Next", sans-serif',
       }}
     >
       <div style={{ maxWidth: '760px', margin: '0 auto', display: 'grid', gap: '16px' }}>
         <div
           style={{
-            borderRadius: '24px',
+            borderRadius: '30px',
             padding: '24px',
-            background: 'rgba(15, 23, 42, 0.82)',
-            border: '1px solid rgba(191, 219, 254, 0.18)',
-            boxShadow: '0 24px 70px rgba(0, 0, 0, 0.28)',
+            background: 'linear-gradient(135deg, #14b8a6 0%, #0ea5e9 55%, #2563eb 100%)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
+            boxShadow: '0 24px 70px rgba(14, 165, 233, 0.18)',
+            color: '#fff',
           }}
         >
           <div style={{ fontSize: '12px', letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.75 }}>
-            Authenticated Quiz App
+            Classroom Check-In
           </div>
           <div style={{ fontSize: '32px', fontWeight: 800, marginTop: '8px' }}>{deck.title}</div>
-          <div style={{ fontSize: '15px', marginTop: '10px', color: '#dbeafe' }}>{status}</div>
+          <div style={{ fontSize: '15px', marginTop: '10px', color: 'rgba(255,255,255,0.92)' }}>{status}</div>
           <div style={{ marginTop: '14px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <span
               style={{
                 fontSize: '12px',
                 padding: '6px 10px',
                 borderRadius: '999px',
-                background: teacherConnected ? 'rgba(34,197,94,0.15)' : 'rgba(248,113,113,0.15)',
-                color: teacherConnected ? '#86efac' : '#fecaca',
-                border: '1px solid rgba(191,219,254,0.16)',
+                background: teacherConnected ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.16)',
+                color: '#fff',
+                border: '1px solid rgba(255,255,255,0.22)',
               }}
             >
               {teacherConnected ? `Teacher: ${teacherLabel ?? deck.teacher}` : 'Teacher mode locked'}
@@ -401,9 +403,9 @@ export function QuizApp() {
                 fontSize: '12px',
                 padding: '6px 10px',
                 borderRadius: '999px',
-                background: 'rgba(59,130,246,0.16)',
-                color: '#bfdbfe',
-                border: '1px solid rgba(191,219,254,0.16)',
+                background: 'rgba(255,255,255,0.18)',
+                color: '#fff',
+                border: '1px solid rgba(255,255,255,0.22)',
               }}
             >
               Score: {progress.score}/{deck.questions.length}
@@ -420,17 +422,18 @@ export function QuizApp() {
         >
           <div
             style={{
-              borderRadius: '20px',
+              borderRadius: '24px',
               padding: '18px',
-              background: 'rgba(15, 23, 42, 0.78)',
-              border: '1px solid rgba(191, 219, 254, 0.14)',
+              background: '#ffffff',
+              border: '1px solid rgba(148, 163, 184, 0.16)',
               display: 'grid',
               gap: '12px',
+              boxShadow: '0 16px 34px rgba(15, 23, 42, 0.06)',
             }}
           >
-            <div style={{ fontSize: '18px', fontWeight: 700 }}>Teacher Login</div>
-            <div style={{ fontSize: '13px', color: '#bfdbfe' }}>
-              Use the teacher passcode to unlock editing. This is stored separately from the chat transcript.
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Teacher Corner</div>
+            <div style={{ fontSize: '13px', color: '#64748b' }}>
+              Use the teacher passcode to unlock editing. This stays separate from the chat transcript.
             </div>
             <input
               type="password"
@@ -439,10 +442,10 @@ export function QuizApp() {
               placeholder="Enter teacher passcode"
               style={{
                 width: '100%',
-                borderRadius: '12px',
-                border: '1px solid rgba(191, 219, 254, 0.22)',
-                background: 'rgba(15, 23, 42, 0.94)',
-                color: '#f8fafc',
+                borderRadius: '14px',
+                border: '1px solid rgba(148, 163, 184, 0.22)',
+                background: '#f8fafc',
+                color: '#0f172a',
                 padding: '12px 14px',
                 fontSize: '14px',
                 boxSizing: 'border-box',
@@ -453,12 +456,13 @@ export function QuizApp() {
                 onClick={connectTeacher}
                 style={{
                   border: 0,
-                  borderRadius: '12px',
+                  borderRadius: '14px',
                   padding: '12px 14px',
-                  background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)',
-                  color: '#451a03',
+                  background: 'linear-gradient(135deg, #22c55e 0%, #0ea5e9 100%)',
+                  color: '#fff',
                   fontWeight: 800,
                   cursor: 'pointer',
+                  boxShadow: '0 12px 24px rgba(14, 165, 233, 0.2)',
                 }}
               >
                 Unlock Teacher Mode
@@ -467,13 +471,13 @@ export function QuizApp() {
                 onClick={disconnectTeacher}
                 disabled={!teacherConnected}
                 style={{
-                  borderRadius: '12px',
+                  borderRadius: '14px',
                   padding: '12px 14px',
                   background: 'transparent',
-                  color: '#dbeafe',
+                  color: '#334155',
                   fontWeight: 700,
                   cursor: 'pointer',
-                  border: '1px solid rgba(191, 219, 254, 0.18)',
+                  border: '1px solid rgba(148, 163, 184, 0.18)',
                 }}
               >
                 Disconnect
@@ -483,30 +487,32 @@ export function QuizApp() {
 
           <div
             style={{
-              borderRadius: '20px',
+              borderRadius: '24px',
               padding: '18px',
-              background: 'rgba(15, 23, 42, 0.78)',
-              border: '1px solid rgba(191, 219, 254, 0.14)',
+              background: '#ffffff',
+              border: '1px solid rgba(148, 163, 184, 0.16)',
               display: 'grid',
               gap: '12px',
+              boxShadow: '0 16px 34px rgba(15, 23, 42, 0.06)',
             }}
           >
-            <div style={{ fontSize: '18px', fontWeight: 700 }}>Quiz Controls</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Quick Reset</div>
             <button
               onClick={() => startQuiz()}
               style={{
                 border: 0,
-                borderRadius: '12px',
+                borderRadius: '14px',
                 padding: '12px 14px',
-                background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                color: '#052e16',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)',
+                color: '#fff',
                 fontWeight: 800,
                 cursor: 'pointer',
+                boxShadow: '0 12px 24px rgba(249, 115, 22, 0.18)',
               }}
             >
               Restart Quiz
             </button>
-            <div style={{ fontSize: '13px', color: '#bfdbfe' }}>
+            <div style={{ fontSize: '13px', color: '#64748b' }}>
               Teacher passcode for the demo: <strong>{DEFAULT_TEACHER_PASSCODE}</strong>
             </div>
           </div>
@@ -515,18 +521,19 @@ export function QuizApp() {
         {currentQuestion && !progress.completed ? (
           <div
             style={{
-              borderRadius: '22px',
+              borderRadius: '26px',
               padding: '20px',
-              background: 'rgba(15, 23, 42, 0.8)',
-              border: '1px solid rgba(191, 219, 254, 0.14)',
+              background: '#ffffff',
+              border: '1px solid rgba(148, 163, 184, 0.16)',
               display: 'grid',
               gap: '14px',
+              boxShadow: '0 20px 40px rgba(15, 23, 42, 0.06)',
             }}
           >
-            <div style={{ fontSize: '12px', opacity: 0.75 }}>
+            <div style={{ fontSize: '12px', opacity: 0.7, color: '#64748b', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               Question {progress.currentIndex + 1} of {deck.questions.length}
             </div>
-            <div style={{ fontSize: '22px', fontWeight: 700 }}>{currentQuestion.prompt}</div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a' }}>{currentQuestion.prompt}</div>
             <div style={{ display: 'grid', gap: '10px' }}>
               {currentQuestion.choices.map((choice, index) => (
                 <button
@@ -537,13 +544,14 @@ export function QuizApp() {
                   }}
                   style={{
                     textAlign: 'left',
-                    borderRadius: '14px',
+                    borderRadius: '16px',
                     padding: '14px 16px',
-                    border: '1px solid rgba(191, 219, 254, 0.18)',
-                    background: 'rgba(30, 41, 59, 0.82)',
-                    color: '#f8fafc',
+                    border: '1px solid rgba(148, 163, 184, 0.16)',
+                    background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)',
+                    color: '#0f172a',
                     cursor: 'pointer',
                     fontSize: '15px',
+                    fontWeight: 700,
                   }}
                 >
                   {String.fromCharCode(65 + index)}. {choice}
@@ -551,7 +559,7 @@ export function QuizApp() {
               ))}
             </div>
             {currentChoiceResult && (
-              <div style={{ fontSize: '14px', color: '#bfdbfe' }}>
+              <div style={{ fontSize: '14px', color: '#0f766e', fontWeight: 700 }}>
                 {currentChoiceResult}
               </div>
             )}
@@ -559,14 +567,14 @@ export function QuizApp() {
         ) : (
           <div
             style={{
-              borderRadius: '22px',
+              borderRadius: '26px',
               padding: '24px',
-              background: 'rgba(15, 23, 42, 0.8)',
-              border: '1px solid rgba(191, 219, 254, 0.14)',
+              background: 'linear-gradient(135deg, #ecfeff 0%, #eff6ff 100%)',
+              border: '1px solid rgba(14, 165, 233, 0.14)',
             }}
           >
-            <div style={{ fontSize: '24px', fontWeight: 800 }}>Quiz Complete</div>
-            <div style={{ marginTop: '10px', color: '#dbeafe' }}>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a' }}>Quiz Complete</div>
+            <div style={{ marginTop: '10px', color: '#475569' }}>
               Final score: {progress.score} out of {deck.questions.length}
             </div>
           </div>

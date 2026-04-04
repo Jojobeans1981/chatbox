@@ -2,10 +2,12 @@ import NiceModal from '@ebay/nice-modal-react'
 import { ActionIcon, Avatar, Badge, Box, Button, Divider, Flex, Paper, ScrollArea, Space, Stack, Text } from '@mantine/core'
 import type { CopilotDetail, ImageSource, Session } from '@shared/types'
 import {
+  IconArrowRight,
   IconCards,
   IconChevronLeft,
   IconChevronRight,
   IconDeviceGamepad2,
+  IconSparkles,
   IconMessageCircle2Filled,
   IconSchool,
   IconShieldLock,
@@ -243,22 +245,25 @@ function Index() {
         id: 'chess',
         name: 'Chess',
         description: 'Play a full game in-chat, ask for a hint mid-match, and keep the board state in context.',
-        badge: 'Required app',
+        badge: 'Strategy Game',
         icon: IconDeviceGamepad2,
+        accent: 'linear-gradient(135deg, #f59e0b 0%, #fb7185 100%)',
       },
       {
         id: 'quiz',
         name: 'Quiz Studio',
         description: 'Students answer questions in chat while teachers can unlock editing with a protected passcode.',
-        badge: 'Authenticated',
+        badge: 'Teacher Tools',
         icon: IconShieldLock,
+        accent: 'linear-gradient(135deg, #14b8a6 0%, #0ea5e9 100%)',
       },
       {
         id: 'flashcards',
         name: 'Flashcards',
         description: 'Review cards, flip for answers, and move through a study deck without leaving the conversation.',
-        badge: 'Study tool',
+        badge: 'Study Deck',
         icon: IconCards,
+        accent: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
       },
     ],
     []
@@ -268,108 +273,259 @@ function Index() {
     <Page title="">
       <div className="p-0 flex flex-col h-full">
         {showDemoLanding ? (
-          <Stack align="center" justify="center" gap="lg" flex={1} p="md">
-            <Stack gap="xs" align="center" maw={720}>
-              <Badge variant="light" radius="xl" size="lg">
-                TutorMeAI Demo
-              </Badge>
-              <Text fw={700} size={isSmallScreen ? 'xl' : '32px'} ta="center">
-                Launch the embedded learning apps directly
-              </Text>
-              <Text c="chatbox-secondary" ta="center" maw={620}>
-                This public build opens in demo mode so reviewers can try the K-12 app experiences without configuring
-                an AI provider first.
-              </Text>
-            </Stack>
+          <Box
+            style={{
+              flex: 1,
+              padding: isSmallScreen ? '18px 14px 22px' : '28px 24px 32px',
+              background:
+                'radial-gradient(circle at top left, rgba(251, 191, 36, 0.18), transparent 30%), radial-gradient(circle at top right, rgba(56, 189, 248, 0.14), transparent 28%), linear-gradient(180deg, #fffaf0 0%, #fff 48%, #f8fbff 100%)',
+            }}
+          >
+            <Stack gap="lg" className={widthFull ? 'w-full' : 'w-full max-w-6xl mx-auto'}>
+              <Paper
+                radius="32px"
+                p={isSmallScreen ? 'lg' : 'xl'}
+                shadow="none"
+                style={{
+                  border: '1px solid rgba(244, 114, 182, 0.14)',
+                  background:
+                    'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,248,235,0.98) 55%, rgba(240,249,255,0.98) 100%)',
+                  overflow: 'hidden',
+                  position: 'relative',
+                }}
+              >
+                <Box
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    pointerEvents: 'none',
+                    background:
+                      'radial-gradient(circle at 12% 18%, rgba(250, 204, 21, 0.18), transparent 22%), radial-gradient(circle at 88% 20%, rgba(96, 165, 250, 0.16), transparent 24%), radial-gradient(circle at 78% 82%, rgba(244, 114, 182, 0.12), transparent 18%)',
+                  }}
+                />
+                <Flex
+                  direction={isSmallScreen ? 'column' : 'row'}
+                  gap="lg"
+                  justify="space-between"
+                  align={isSmallScreen ? 'flex-start' : 'center'}
+                  style={{ position: 'relative' }}
+                >
+                  <Stack gap="sm" maw={680}>
+                    <Badge
+                      radius="xl"
+                      size="lg"
+                      variant="filled"
+                      style={{
+                        width: 'fit-content',
+                        background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
+                      }}
+                    >
+                      K-12 Learning Space
+                    </Badge>
+                    <Text
+                      fw={800}
+                      ta={isSmallScreen ? 'left' : 'left'}
+                      style={{
+                        fontSize: isSmallScreen ? '2rem' : '3.2rem',
+                        lineHeight: 1.02,
+                        letterSpacing: '-0.04em',
+                        color: '#172554',
+                      }}
+                    >
+                      Pick a classroom activity and jump straight into learning.
+                    </Text>
+                    <Text size="md" style={{ color: '#475569', maxWidth: 620 }}>
+                      This demo is tuned for K-12 students and teachers, with kid-friendly study tools that stay right
+                      inside the chat experience.
+                    </Text>
+                    <Flex gap="sm" wrap="wrap">
+                      <Badge radius="xl" variant="light" color="yellow" size="lg">
+                        Games
+                      </Badge>
+                      <Badge radius="xl" variant="light" color="cyan" size="lg">
+                        Quizzes
+                      </Badge>
+                      <Badge radius="xl" variant="light" color="grape" size="lg">
+                        Flashcards
+                      </Badge>
+                    </Flex>
+                  </Stack>
 
-            <Flex
-              gap="md"
-              wrap="wrap"
-              justify="center"
-              className={widthFull ? 'w-full' : 'w-full max-w-5xl mx-auto'}
-            >
-              {demoApps.map((app) => {
-                const Icon = app.icon
-                return (
                   <Paper
-                    key={app.id}
-                    radius="xl"
-                    withBorder
+                    radius="28px"
                     p="lg"
                     shadow="none"
-                    style={{ width: isSmallScreen ? '100%' : 320 }}
+                    style={{
+                      minWidth: isSmallScreen ? '100%' : 280,
+                      background: 'rgba(255,255,255,0.9)',
+                      border: '1px solid rgba(148, 163, 184, 0.18)',
+                    }}
                   >
-                    <Stack gap="md" h="100%" justify="space-between">
-                      <Stack gap="sm">
-                        <Flex justify="space-between" align="center" gap="sm">
-                          <Flex align="center" gap="sm">
+                    <Stack gap="sm">
+                      <Flex align="center" gap="xs">
+                        <Box
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 14,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: 'linear-gradient(135deg, #fde68a 0%, #fdba74 100%)',
+                          }}
+                        >
+                          <IconSparkles size={20} color="#9a3412" />
+                        </Box>
+                        <Text fw={700} style={{ color: '#1e293b' }}>
+                          Ready to explore
+                        </Text>
+                      </Flex>
+                      <Text size="sm" style={{ color: '#64748b' }}>
+                        Open any activity below. No setup is needed for students or graders to try the experience.
+                      </Text>
+                    </Stack>
+                  </Paper>
+                </Flex>
+              </Paper>
+
+              <Flex
+                gap="md"
+                wrap="wrap"
+                justify="center"
+                align="stretch"
+                className={widthFull ? 'w-full' : 'w-full max-w-6xl mx-auto'}
+              >
+                {demoApps.map((app) => {
+                  const Icon = app.icon
+                  return (
+                    <Paper
+                      key={app.id}
+                      radius="28px"
+                      p="lg"
+                      shadow="none"
+                      style={{
+                        width: isSmallScreen ? '100%' : 340,
+                        border: '1px solid rgba(148, 163, 184, 0.16)',
+                        background: '#ffffff',
+                        overflow: 'hidden',
+                        position: 'relative',
+                      }}
+                    >
+                      <Box
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          pointerEvents: 'none',
+                          background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(248,250,252,0.86) 100%)',
+                        }}
+                      />
+                      <Stack gap="lg" h="100%" justify="space-between" style={{ position: 'relative' }}>
+                        <Stack gap="md">
+                          <Box
+                            style={{
+                              height: 110,
+                              borderRadius: 22,
+                              background: app.accent,
+                              display: 'flex',
+                              alignItems: 'flex-end',
+                              justifyContent: 'space-between',
+                              padding: '18px',
+                            }}
+                          >
                             <Box
                               style={{
-                                width: 44,
-                                height: 44,
-                                borderRadius: 14,
+                                width: 54,
+                                height: 54,
+                                borderRadius: 18,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                background:
-                                  'linear-gradient(135deg, var(--chatbox-background-brand-secondary), rgba(99, 102, 241, 0.14))',
+                                background: 'rgba(255,255,255,0.24)',
+                                backdropFilter: 'blur(10px)',
                               }}
                             >
-                              <Icon size={22} color="var(--chatbox-tint-brand)" />
+                              <Icon size={28} color="#fff" />
                             </Box>
-                            <Stack gap={2}>
-                              <Text fw={700}>{app.name}</Text>
-                              <Badge variant="dot" color="chatbox-brand" w="fit-content">
-                                {app.badge}
-                              </Badge>
-                            </Stack>
-                          </Flex>
-                        </Flex>
-                        <Text c="chatbox-secondary">{app.description}</Text>
+                            <Badge
+                              radius="xl"
+                              variant="filled"
+                              style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)' }}
+                            >
+                              {app.badge}
+                            </Badge>
+                          </Box>
+                          <Stack gap={6}>
+                            <Text fw={800} size="xl" style={{ color: '#0f172a' }}>
+                              {app.name}
+                            </Text>
+                            <Text size="sm" style={{ color: '#475569', lineHeight: 1.6 }}>
+                              {app.description}
+                            </Text>
+                          </Stack>
+                        </Stack>
+
+                        <Button
+                          fullWidth
+                          radius="xl"
+                          size="md"
+                          rightSection={<IconArrowRight size={18} />}
+                          style={{
+                            background: app.accent,
+                            boxShadow: 'none',
+                          }}
+                          onClick={() =>
+                            router.navigate({
+                              to: '/plugins/$pluginId',
+                              params: { pluginId: app.id },
+                            })
+                          }
+                        >
+                          Start {app.name}
+                        </Button>
                       </Stack>
-
-                      <Button
-                        fullWidth
-                        onClick={() =>
-                          router.navigate({
-                            to: '/plugins/$pluginId',
-                            params: { pluginId: app.id },
-                          })
-                        }
-                      >
-                        Open {app.name}
-                      </Button>
-                    </Stack>
-                  </Paper>
-                )
-              })}
-            </Flex>
-
-            <Paper radius="lg" withBorder p="md" className={widthFull ? 'w-full' : 'w-full max-w-3xl mx-auto'}>
-              <Flex align="flex-start" gap="sm">
-                <Box
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 12,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'var(--chatbox-background-brand-secondary)',
-                  }}
-                >
-                  <IconSchool size={18} color="var(--chatbox-tint-brand)" />
-                </Box>
-                <Stack gap={4}>
-                  <Text fw={600}>Reviewer notes</Text>
-                  <Text c="chatbox-secondary">
-                    Chess shows complex ongoing state, Quiz Studio demonstrates authenticated teacher controls, and
-                    Flashcards covers a lightweight study workflow inside the same host shell.
-                  </Text>
-                </Stack>
+                    </Paper>
+                  )
+                })}
               </Flex>
-            </Paper>
-          </Stack>
+
+              <Paper
+                radius="28px"
+                p="lg"
+                shadow="none"
+                className={widthFull ? 'w-full' : 'w-full max-w-4xl mx-auto'}
+                style={{
+                  border: '1px solid rgba(14, 165, 233, 0.14)',
+                  background: 'linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%)',
+                }}
+              >
+                <Flex align="flex-start" gap="md">
+                  <Box
+                    style={{
+                      width: 46,
+                      height: 46,
+                      borderRadius: 16,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'linear-gradient(135deg, #22c55e 0%, #38bdf8 100%)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <IconSchool size={22} color="#fff" />
+                  </Box>
+                  <Stack gap={4}>
+                    <Text fw={700} style={{ color: '#0f172a' }}>
+                      Built for school-friendly learning
+                    </Text>
+                    <Text size="sm" style={{ color: '#475569', lineHeight: 1.6 }}>
+                      Chess supports strategy and ongoing state, Quiz Studio supports teacher-led practice, and
+                      Flashcards gives students a quick review tool inside the same chat shell.
+                    </Text>
+                  </Stack>
+                </Flex>
+              </Paper>
+            </Stack>
+          </Box>
         ) : messageLayout || welcomeCardMode !== 'none' ? (
           <Stack align="center" justify="center" gap="sm" flex={1}>
             <HomepageIcon className="h-8" />

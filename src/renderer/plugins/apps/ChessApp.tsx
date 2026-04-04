@@ -387,17 +387,38 @@ export function ChessApp() {
   return (
     <div
       style={{
-        fontFamily: '-apple-system, sans-serif',
-        padding: '16px',
-        background: '#1a1a2e',
+        fontFamily: '"Trebuchet MS", "Avenir Next", sans-serif',
+        padding: '18px',
+        background:
+          'radial-gradient(circle at top left, rgba(250, 204, 21, 0.2), transparent 24%), radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 26%), linear-gradient(180deg, #fff8e8 0%, #fff 44%, #f8fbff 100%)',
         minHeight: '100vh',
-        color: '#e0e0e0',
+        color: '#0f172a',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '12px',
+        gap: '14px',
       }}
     >
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '400px',
+          borderRadius: '24px',
+          padding: '16px 18px',
+          background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ec4899 100%)',
+          color: '#fff',
+          boxShadow: '0 18px 40px rgba(249, 115, 22, 0.2)',
+        }}
+      >
+        <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', opacity: 0.88 }}>
+          Brain Game
+        </div>
+        <div style={{ fontSize: '28px', fontWeight: 900, lineHeight: 1.05, marginTop: '6px' }}>Chess Club</div>
+        <div style={{ fontSize: '14px', marginTop: '8px', opacity: 0.9 }}>
+          Practice strategy, try legal moves, and ask the chat for help during the game.
+        </div>
+      </div>
+
       <div
         style={{
           display: 'flex',
@@ -407,15 +428,20 @@ export function ChessApp() {
           width: '100%',
           maxWidth: '400px',
           justifyContent: 'space-between',
+          padding: '12px 14px',
+          borderRadius: '18px',
+          background: 'rgba(255,255,255,0.88)',
+          border: '1px solid rgba(148, 163, 184, 0.16)',
         }}
       >
         <div
           style={{
-            padding: '4px 12px',
+            padding: '6px 12px',
             borderRadius: '999px',
             background: status === 'playing' ? (isPlayerTurn ? '#22c55e33' : '#eab30833') : '#ef444433',
             border: `1px solid ${status === 'playing' ? (isPlayerTurn ? '#22c55e' : '#eab308') : '#ef4444'}`,
             fontSize: '12px',
+            fontWeight: 800,
           }}
         >
           {status === 'waiting' && 'Waiting to start...'}
@@ -424,12 +450,22 @@ export function ChessApp() {
           {status === 'stalemate' && 'Stalemate'}
           {status === 'draw' && 'Draw'}
         </div>
-        <span style={{ fontSize: '12px', opacity: 0.6 }}>
+        <span style={{ fontSize: '12px', opacity: 0.7, fontWeight: 700, color: '#475569' }}>
           Move {Math.ceil(game.moveNumber())} | {turnText}
         </span>
       </div>
 
-      <div style={{ width: '100%', maxWidth: '400px' }}>
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '400px',
+          padding: '14px',
+          borderRadius: '26px',
+          background: '#ffffff',
+          border: '1px solid rgba(148, 163, 184, 0.18)',
+          boxShadow: '0 24px 50px rgba(15, 23, 42, 0.08)',
+        }}
+      >
         <Chessboard
           position={game.fen()}
           onSquareClick={onSquareClick}
@@ -438,11 +474,11 @@ export function ChessApp() {
           boardOrientation={playerColor}
           customSquareStyles={customSquareStyles}
           customBoardStyle={{
-            borderRadius: '8px',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+            borderRadius: '18px',
+            boxShadow: '0 16px 36px rgba(15, 23, 42, 0.14)',
           }}
-          customDarkSquareStyle={{ backgroundColor: '#4a4a6a' }}
-          customLightSquareStyle={{ backgroundColor: '#8888aa' }}
+          customDarkSquareStyle={{ backgroundColor: '#d97706' }}
+          customLightSquareStyle={{ backgroundColor: '#fde68a' }}
           animationDuration={200}
         />
       </div>
@@ -452,18 +488,22 @@ export function ChessApp() {
           style={{
             width: '100%',
             maxWidth: '400px',
-            background: '#16162a',
-            borderRadius: '8px',
-            padding: '8px 12px',
+            background: '#ffffff',
+            borderRadius: '18px',
+            padding: '12px 14px',
             fontSize: '12px',
             maxHeight: '80px',
             overflowY: 'auto',
+            border: '1px solid rgba(148, 163, 184, 0.16)',
           }}
         >
+          <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#64748b', marginBottom: '8px' }}>
+            Move List
+          </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {moveHistory.map((move, index) => (
-              <span key={`${move}-${index}`} style={{ opacity: 0.7 }}>
-                {index % 2 === 0 && <strong style={{ opacity: 0.4 }}>{Math.floor(index / 2) + 1}.</strong>} {move}
+              <span key={`${move}-${index}`} style={{ opacity: 0.82, color: '#334155' }}>
+                {index % 2 === 0 && <strong style={{ opacity: 0.5 }}>{Math.floor(index / 2) + 1}.</strong>} {move}
               </span>
             ))}
           </div>
@@ -471,7 +511,19 @@ export function ChessApp() {
       )}
 
       {isEmbedded && (
-        <div style={{ width: '100%', maxWidth: '400px', fontSize: '12px', opacity: 0.7, textAlign: 'center' }}>
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '400px',
+            fontSize: '12px',
+            textAlign: 'center',
+            color: '#475569',
+            background: 'rgba(255,255,255,0.8)',
+            border: '1px solid rgba(148, 163, 184, 0.14)',
+            borderRadius: '16px',
+            padding: '10px 12px',
+          }}
+        >
           Click a piece, then choose a destination square to play directly inside the chat.
         </div>
       )}
