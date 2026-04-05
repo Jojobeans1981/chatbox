@@ -26,12 +26,22 @@ function buildPluginIframeUrl(pluginId: string, pluginSessionId: string, capabil
     return ''
   }
 
+  const plugin = getPluginById(pluginId)
+  const iframePath = plugin?.iframeUrl ?? `/plugins/${pluginId}`
+
   const query = `pluginId=${encodeURIComponent(pluginId)}&sessionId=${encodeURIComponent(pluginSessionId)}&capabilityToken=${encodeURIComponent(capabilityToken)}`
   if (window.location.hash.startsWith('#/')) {
-    return `${window.location.origin}${window.location.pathname}${window.location.search}#/plugins/${pluginId}?${query}`
+    if (iframePath.startsWith('http://') || iframePath.startsWith('https://')) {
+      return `${iframePath}${iframePath.includes('?') ? '&' : '?'}${query}`
+    }
+    return `${window.location.origin}${window.location.pathname}${window.location.search}#${iframePath}?${query}`
   }
 
-  return `${window.location.origin}/plugins/${pluginId}?${query}`
+  if (iframePath.startsWith('http://') || iframePath.startsWith('https://')) {
+    return `${iframePath}${iframePath.includes('?') ? '&' : '?'}${query}`
+  }
+
+  return `${window.location.origin}${iframePath}?${query}`
 }
 
 export default function PluginFrame({
@@ -58,11 +68,24 @@ export default function PluginFrame({
   )
   const pluginOrigin = useMemo(() => {
     try {
-      return new URL(iframeUrl).origin
+      const origin = new URL(iframeUrl).origin
+      const trustedHosts = plugin?.originPolicy?.trustedHosts ?? ['self']
+      const expectedHost = new URL(iframeUrl).host
+      if (trustedHosts.includes('self') && origin === window.location.origin) {
+        return origin
+      }
+      if (trustedHosts.includes(expectedHost)) {
+        return origin
+      }
+      return null
     } catch {
       return null
     }
-  }, [iframeUrl])
+  }, [iframeUrl, plugin?.originPolicy?.trustedHosts])
+  const sandboxPolicy = useMemo(
+    () => (plugin?.originPolicy?.sandboxPermissions ?? ['allow-scripts', 'allow-forms']).join(' '),
+    [plugin?.originPolicy?.sandboxPermissions]
+  )
   const pluginSession = useMemo(
     () => session?.activePlugins?.find((entry) => entry.id === pluginSessionId),
     [session?.activePlugins, pluginSessionId]
@@ -259,7 +282,7 @@ export default function PluginFrame({
       <iframe
         ref={iframeRef}
         src={iframeUrl}
-        sandbox="allow-scripts allow-forms allow-same-origin"
+        sandbox={sandboxPolicy}
         referrerPolicy="same-origin"
         title={plugin.name}
         onError={() => setError('Failed to load the embedded app.')}

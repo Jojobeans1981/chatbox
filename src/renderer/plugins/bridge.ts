@@ -15,6 +15,28 @@ function hasBridgeIdentity(
   )
 }
 
+function isValidCredentialPayload(value: unknown) {
+  if (value === null) {
+    return true
+  }
+  if (!isRecord(value) || typeof value.type !== 'string') {
+    return false
+  }
+  if (value.type === 'api_key') {
+    return typeof value.secret === 'string' && (value.label === undefined || typeof value.label === 'string')
+  }
+  if (value.type === 'oauth2') {
+    return (
+      typeof value.accessToken === 'string' &&
+      (value.refreshToken === undefined || typeof value.refreshToken === 'string') &&
+      (value.expiresAt === undefined || typeof value.expiresAt === 'number') &&
+      (value.label === undefined || typeof value.label === 'string') &&
+      (value.scopes === undefined || (Array.isArray(value.scopes) && value.scopes.every((scope) => typeof scope === 'string')))
+    )
+  }
+  return false
+}
+
 export function parsePluginToPlatformMessage(
   value: unknown,
   expected: { pluginId: string; sessionId: string; capabilityToken: string }
@@ -31,13 +53,7 @@ export function parsePluginToPlatformMessage(
     case 'pong':
       return value as PluginToPlatformMessage
     case 'credential_update':
-      if (
-        value.credential === null ||
-        (isRecord(value.credential) &&
-          value.credential.type === 'api_key' &&
-          typeof value.credential.secret === 'string' &&
-          (value.credential.label === undefined || typeof value.credential.label === 'string'))
-      ) {
+      if (isValidCredentialPayload(value.credential)) {
         return value as PluginToPlatformMessage
       }
       return null
@@ -87,10 +103,6 @@ export function isValidCredentialStateMessage(
     isRecord(value) &&
     value.type === 'credential_state' &&
     hasBridgeIdentity(value, expected) &&
-    (value.credential === null ||
-      (isRecord(value.credential) &&
-        value.credential.type === 'api_key' &&
-        typeof value.credential.secret === 'string' &&
-        (value.credential.label === undefined || typeof value.credential.label === 'string')))
+    isValidCredentialPayload(value.credential)
   )
 }

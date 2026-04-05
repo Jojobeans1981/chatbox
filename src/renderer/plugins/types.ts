@@ -1,5 +1,6 @@
 export type PluginAuthType = 'none' | 'api_key' | 'oauth2'
 export type PluginContentRating = 'everyone' | 'teen' | 'adult'
+export type PluginSandboxPermission = 'allow-scripts' | 'allow-forms' | 'allow-same-origin' | 'allow-popups'
 
 export interface PluginToolDefinition {
   name: string
@@ -15,11 +16,23 @@ export interface PluginManifest {
   description: string
   version: string
   iframeUrl: string
+  developerName?: string
   iconUrl?: string
   authType: PluginAuthType
   tools: PluginToolDefinition[]
   contentRating: PluginContentRating
   maxStateUpdatesPerSecond?: number
+  originPolicy?: {
+    trustedHosts?: string[]
+    sandboxPermissions?: PluginSandboxPermission[]
+  }
+  authConfig?: {
+    authorizationUrl?: string
+    tokenUrl?: string
+    clientId?: string
+    scopes?: string[]
+    tokenLifetimeSeconds?: number
+  }
 }
 
 export interface PluginOpenResult {
@@ -42,9 +55,13 @@ export interface PluginToolExecutionResult {
 }
 
 export interface PluginCredentialPayload {
-  type: 'api_key'
-  secret: string
+  type: 'api_key' | 'oauth2'
+  secret?: string
   label?: string
+  accessToken?: string
+  refreshToken?: string
+  expiresAt?: number
+  scopes?: string[]
 }
 
 export type PlatformToPluginMessage =

@@ -1,3 +1,4 @@
+import { clearRegisteredPlugins, getRegisteredPluginById, getRegisteredPlugins, getRegisteredSafePlugins, registerPlugins } from './registry'
 import type { PluginManifest } from './types'
 
 export const builtinChessPlugin: PluginManifest = {
@@ -5,9 +6,14 @@ export const builtinChessPlugin: PluginManifest = {
   name: 'Chess',
   description: 'Play a game of chess with an interactive board, legal move validation, and move hints.',
   version: '1.0.0',
+  developerName: 'TutorMeAI Games',
   iframeUrl: '/plugins/chess',
   authType: 'none',
   contentRating: 'everyone',
+  originPolicy: {
+    trustedHosts: ['self'],
+    sandboxPermissions: ['allow-scripts', 'allow-forms', 'allow-same-origin'],
+  },
   tools: [
     {
       name: 'start_game',
@@ -66,9 +72,14 @@ export const builtinFlashcardsPlugin: PluginManifest = {
   name: 'Flashcards',
   description: 'Review a study deck inside chat with card flipping and lightweight deck navigation.',
   version: '1.0.0',
+  developerName: 'TutorMeAI Study Tools',
   iframeUrl: '/plugins/flashcards',
   authType: 'none',
   contentRating: 'everyone',
+  originPolicy: {
+    trustedHosts: ['self'],
+    sandboxPermissions: ['allow-scripts', 'allow-forms', 'allow-same-origin'],
+  },
   tools: [
     {
       name: 'open_deck',
@@ -109,11 +120,23 @@ export const builtinQuizPlugin: PluginManifest = {
   id: 'quiz',
   name: 'Quiz Studio',
   description:
-    'Launch a classroom quiz inside chat, let students answer questions, and unlock teacher editing with an authenticated passcode.',
+    'Launch a classroom quiz inside chat, let students answer questions, and unlock teacher editing with an authenticated classroom OAuth flow.',
   version: '1.0.0',
+  developerName: 'TutorMeAI Classroom',
   iframeUrl: '/plugins/quiz',
-  authType: 'api_key',
+  authType: 'oauth2',
   contentRating: 'everyone',
+  originPolicy: {
+    trustedHosts: ['self'],
+    sandboxPermissions: ['allow-scripts', 'allow-forms', 'allow-same-origin'],
+  },
+  authConfig: {
+    authorizationUrl: '/plugins/quiz?screen=authorize',
+    tokenUrl: '/plugins/quiz?screen=token',
+    clientId: 'tutormeai-classroom-demo',
+    scopes: ['quiz.read', 'quiz.write'],
+    tokenLifetimeSeconds: 3600,
+  },
   tools: [
     {
       name: 'open_quiz',
@@ -166,14 +189,17 @@ export const builtinQuizPlugin: PluginManifest = {
 
 const BUILTIN_PLUGINS = [builtinChessPlugin, builtinFlashcardsPlugin, builtinQuizPlugin]
 
+clearRegisteredPlugins()
+registerPlugins(BUILTIN_PLUGINS)
+
 export function getBuiltinPlugins() {
-  return BUILTIN_PLUGINS
+  return getRegisteredPlugins()
 }
 
 export function getSafeBuiltinPlugins() {
-  return BUILTIN_PLUGINS.filter((plugin) => plugin.contentRating === 'everyone')
+  return getRegisteredSafePlugins()
 }
 
 export function getPluginById(pluginId: string) {
-  return BUILTIN_PLUGINS.find((plugin) => plugin.id === pluginId)
+  return getRegisteredPluginById(pluginId)
 }

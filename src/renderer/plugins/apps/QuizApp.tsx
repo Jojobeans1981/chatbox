@@ -28,6 +28,8 @@ type QuizProgress = {
 }
 
 const DEFAULT_TEACHER_PASSCODE = 'TUTOR-CLASSROOM'
+const QUIZ_OAUTH_SCOPE = ['quiz.read', 'quiz.write']
+const QUIZ_TOKEN_LIFETIME_MS = 60 * 60 * 1000
 
 const DEFAULT_DECK: QuizDeck = {
   title: 'Fractions Review',
@@ -73,8 +75,9 @@ export function QuizApp() {
   const [teacherConnected, setTeacherConnected] = useState(false)
   const [teacherLabel, setTeacherLabel] = useState<string | null>(null)
   const [passcodeInput, setPasscodeInput] = useState('')
+  const [tokenExpiryLabel, setTokenExpiryLabel] = useState<string | null>(null)
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null)
-  const [status, setStatus] = useState('Teacher can unlock quiz editing. Students can answer directly in the chat panel.')
+  const [status, setStatus] = useState('Teachers can sign in to Quiz Studio. Students can answer directly in the chat panel.')
 
   const currentQuestion = deck.questions[progress.currentIndex] ?? null
 
@@ -134,13 +137,18 @@ export function QuizApp() {
     setTeacherConnected(true)
     setTeacherLabel(DEFAULT_DECK.teacher)
     setPasscodeInput('')
-    setStatus(`Teacher mode unlocked for ${DEFAULT_DECK.teacher}.`)
+    const expiresAt = Date.now() + QUIZ_TOKEN_LIFETIME_MS
+    setTokenExpiryLabel(new Date(expiresAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }))
+    setStatus(`Teacher OAuth session approved for ${DEFAULT_DECK.teacher}.`)
     sendToParent({
       type: 'credential_update',
       credential: {
-        type: 'api_key',
-        secret: DEFAULT_TEACHER_PASSCODE,
+        type: 'oauth2',
         label: DEFAULT_DECK.teacher,
+        accessToken: `quiz_access_${DEFAULT_TEACHER_PASSCODE}`,
+        refreshToken: 'quiz_refresh_demo_token',
+        expiresAt,
+        scopes: QUIZ_OAUTH_SCOPE,
       },
     })
     publishState(`Quiz teacher mode connected for ${DEFAULT_DECK.teacher}.`, {
@@ -152,6 +160,7 @@ export function QuizApp() {
   const disconnectTeacher = useCallback(() => {
     setTeacherConnected(false)
     setTeacherLabel(null)
+    setTokenExpiryLabel(null)
     setStatus('Teacher mode disconnected.')
     sendToParent({
       type: 'credential_update',
@@ -274,13 +283,19 @@ export function QuizApp() {
       }
 
       if (isValidCredentialStateMessage(data, bridgeContext)) {
-        if (data.credential?.type === 'api_key' && data.credential.secret === DEFAULT_TEACHER_PASSCODE) {
+        if (data.credential?.type === 'oauth2' && data.credential.accessToken) {
           setTeacherConnected(true)
           setTeacherLabel(data.credential.label ?? DEFAULT_DECK.teacher)
-          setStatus(`Teacher mode unlocked for ${data.credential.label ?? DEFAULT_DECK.teacher}.`)
+          setTokenExpiryLabel(
+            typeof data.credential.expiresAt === 'number'
+              ? new Date(data.credential.expiresAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+              : null
+          )
+          setStatus(`Teacher OAuth session approved for ${data.credential.label ?? DEFAULT_DECK.teacher}.`)
         } else {
           setTeacherConnected(false)
           setTeacherLabel(null)
+          setTokenExpiryLabel(null)
         }
         return
       }
@@ -350,6 +365,27 @@ export function QuizApp() {
     }
     return () => window.removeEventListener('message', handleMessage)
   }, [answerQuestion, bridgeContext, sendToParent, startQuiz, updateDeckTitle])
+
+  useEffect(() => {
+    if (!teacherConnected) {
+      return
+    }
+    const intervalId = window.setInterval(() => {
+      sendToParent({
+        type: 'credential_update',
+        credential: {
+          type: 'oauth2',
+          label: teacherLabel ?? DEFAULT_DECK.teacher,
+          accessToken: `quiz_access_${DEFAULT_TEACHER_PASSCODE}`,
+          refreshToken: 'quiz_refresh_demo_token',
+          expiresAt: Date.now() + QUIZ_TOKEN_LIFETIME_MS,
+          scopes: QUIZ_OAUTH_SCOPE,
+        },
+      })
+    }, QUIZ_TOKEN_LIFETIME_MS / 2)
+
+    return () => window.clearInterval(intervalId)
+  }, [sendToParent, teacherConnected, teacherLabel])
 
   const currentChoiceResult =
     selectedChoice !== null && currentQuestion
@@ -431,15 +467,16 @@ export function QuizApp() {
               boxShadow: '0 16px 34px rgba(15, 23, 42, 0.06)',
             }}
           >
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Teacher Corner</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Teacher Sign-In</div>
             <div style={{ fontSize: '13px', color: '#64748b' }}>
-              Use the teacher passcode to unlock editing. This stays separate from the chat transcript.
+              Use the classroom approval code to simulate an OAuth classroom sign-in. Tokens stay separate from the
+              chat transcript.
             </div>
             <input
               type="password"
               value={passcodeInput}
               onChange={(event) => setPasscodeInput(event.target.value)}
-              placeholder="Enter teacher passcode"
+              placeholder="Enter classroom approval code"
               style={{
                 width: '100%',
                 borderRadius: '14px',
@@ -465,7 +502,7 @@ export function QuizApp() {
                   boxShadow: '0 12px 24px rgba(14, 165, 233, 0.2)',
                 }}
               >
-                Unlock Teacher Mode
+                Approve Teacher Access
               </button>
               <button
                 onClick={disconnectTeacher}
@@ -496,7 +533,7 @@ export function QuizApp() {
               boxShadow: '0 16px 34px rgba(15, 23, 42, 0.06)',
             }}
           >
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Quick Reset</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Session Controls</div>
             <button
               onClick={() => startQuiz()}
               style={{
@@ -513,7 +550,11 @@ export function QuizApp() {
               Restart Quiz
             </button>
             <div style={{ fontSize: '13px', color: '#64748b' }}>
-              Teacher passcode for the demo: <strong>{DEFAULT_TEACHER_PASSCODE}</strong>
+              Demo classroom approval code: <strong>{DEFAULT_TEACHER_PASSCODE}</strong>
+            </div>
+            <div style={{ fontSize: '13px', color: '#64748b' }}>
+              OAuth scopes: <strong>{QUIZ_OAUTH_SCOPE.join(', ')}</strong>
+              {tokenExpiryLabel ? ` · token refreshes until ${tokenExpiryLabel}` : ''}
             </div>
           </div>
         </div>
